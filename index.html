@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Expense Tracker — Starter</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--accent:#60a5fa;--muted:#9ca3af;--glass:rgba(255,255,255,0.03)}
+    *{box-sizing:border-box}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; margin:0; background:linear-gradient(180deg,#071029 0%,#06101b 100%); color:#e6eef8; padding:18px}
+    .wrap{max-width:950px;margin:18px auto}
+    header{display:flex;gap:12px;align-items:center;justify-content:space-between}
+    h1{font-size:20px;margin:0}
+    .card{background:var(--card);padding:14px;border-radius:12px;box-shadow:0 6px 18px rgba(2,6,23,0.6);}
+    .row{display:flex;gap:12px;align-items:center}
+    input,select,button,textarea{background:var(--glass);border:1px solid rgba(255,255,255,0.04);color:inherit;padding:8px;border-radius:8px}
+    .grid{display:grid;gap:12px}
+    .cols-3{grid-template-columns:1fr 1fr 1fr}
+    .cols-2{grid-template-columns:1fr 1fr}
+    .muted{color:var(--muted);font-size:13px}
+    .right{text-align:right}
+
+    /* responsive */
+    @media (max-width:720px){.cols-3,.cols-2{grid-template-columns:1fr}}
+
+    .expense-list{max-height:260px;overflow:auto;margin-top:10px}
+    .expense-item{display:flex;justify-content:space-between;padding:10px;border-bottom:1px solid rgba(255,255,255,0.02)}
+    .btn{cursor:pointer}
+    .btn-primary{background:linear-gradient(90deg,var(--accent),#7dd3fc);color:#042a3a;border:none}
+    .small{font-size:13px;padding:6px}
+    .danger{background:transparent;border:1px solid rgba(255,60,60,0.15);color:#ff9b9b}
+    .pill{background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:999px;font-size:13px}
+    .progress{height:12px;background:rgba(255,255,255,0.04);border-radius:999px;overflow:hidden}
+    .progress > i{display:block;height:100%;background:linear-gradient(90deg,#34d399,#60a5fa)}
+    footer{margin-top:18px;text-align:center;color:var(--muted);font-size:13px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Expense Tracker (Starter)</h1>
+      <div class="row">
+        <div id="user-info" class="muted">Not signed in</div>
+        <button id="auth-btn" class="btn small">Sign in</button>
+      </div>
+    </header>
+
+    <section style="margin-top:12px" class="card">
+      <div class="grid cols-3">
+        <div>
+          <div class="muted">Emergency Fund (untouchable)</div>
+          <div style="font-weight:700;font-size:18px">₹ <span id="emergency">32000</span></div>
+        </div>
+        <div>
+          <div class="muted">Monthly Income</div>
+          <input id="income" type="number" placeholder="Enter monthly income" />
+        </div>
+        <div>
+          <div class="muted">Savings rule</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input id="savingsPercent" type="number" placeholder="%" style="width:84px" />
+            <div class="muted">or</div>
+            <input id="savingsFixed" type="number" placeholder="Fixed amount" style="width:140px" />
+          </div>
+          <div class="muted" style="margin-top:6px">You can set % OR fixed amount. % takes precedence if provided.</div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px" class="grid cols-2">
+        <div class="card" style="background:transparent;padding:10px">
+          <div class="muted">This month's allocated savings</div>
+          <div style="font-weight:700;font-size:18px">₹ <span id="allocatedSavings">0</span></div>
+        </div>
+        <div class="card" style="background:transparent;padding:10px">
+          <div class="muted">Spendable this month</div>
+          <div style="font-weight:700;font-size:18px">₹ <span id="spendable">0</span></div>
+        </div>
+      </div>
+
+    </section>
+
+    <section style="margin-top:12px" class="card">
+      <h3 style="margin:0 0 8px 0">Add Expense</h3>
+      <div class="grid cols-3">
+        <input id="amount" type="number" placeholder="Amount (₹)" />
+        <input id="category" placeholder="Category (e.g., Food)" />
+        <input id="note" placeholder="Note (optional)" />
+      </div>
+      <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+        <input id="date" type="date" />
+        <button id="add-expense" class="btn btn-primary small">Add Expense</button>
+        <button id="clear-expenses" class="btn small danger">Clear local data</button>
+      </div>
+
+      <div style="margin-top:12px">
+        <div class="muted">This month</div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-weight:700;font-size:18px">Spent: ₹ <span id="spent">0</span></div>
+          <div class="muted">Remaining: <span id="remaining">₹ 0</span></div>
+        </div>
+        <div class="expense-list card" id="list"></div>
+      </div>
+
+    </section>
+
+    <section style="margin-top:12px" class="card">
+      <h3 style="margin:0 0 8px 0">Goals (save toward future purchases)</h3>
+      <div class="grid cols-3">
+        <input id="goal-title" placeholder="Goal (e.g., Laptop)" />
+        <input id="goal-target" type="number" placeholder="Target amount (₹)" />
+        <input id="goal-deadline" type="date" />
+      </div>
+      <div style="margin-top:8px;display:flex;gap:8px">
+        <button id="add-goal" class="btn small btn-primary">Add Goal</button>
+      </div>
+      <div id="goals" style="margin-top:10px"></div>
+    </section>
+
+    <footer>Starter app — paste your Firebase config into the script section to enable syncing. Works locally (LocalStorage) if no config provided.</footer>
+  </div>
+
+<script>
+// --- Configuration: PASTE your Firebase config object here to enable cloud mode.
+// Example (do NOT include quotes around keys):
+// const FIREBASE_CONFIG = {
+//   apiKey: "YOUR_KEY",
+//   authDomain: "your-app.firebaseapp.com",
+//   projectId: "your-app",
+//   storageBucket: "your-app.appspot.com",
+//   messagingSenderId: "...",
+//   appId: "1:...:web:..."
+// };
+
+const FIREBASE_CONFIG = null; // <-- set to null to use LocalStorage-only mode
+
+// --- App constants
+const EMERGENCY_FUND = 32000; // kept safe
+
+// --- Minimal reactive UI helpers
+const $ = id => document.getElementById(id);
+function fmt(n){ return Number(n||0).toLocaleString(); }
+
+// --- Local storage keys
+const LS_KEY = 'expense-tracker-v1';
+
+// --- Simple in-memory state (mirrors backend/local)
+let state = { income:0, savingsPercent:0, savingsFixed:0, expenses:[], goals:[], user:null };
+
+// --- FIREBASE code (lazy load only when config is present)
+let useFirebase = false;
+let db = null;
+let auth = null;
+async function initFirebase(){
+  if(!FIREBASE_CONFIG) return false;
+  try{
+    // load SDKs dynamically
+    const s1 = document.createElement('script');
+    s1.src = 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js';
+    document.head.appendChild(s1);
+    await new Promise(r=>s1.onload=r);
+    const s2 = document.createElement('script');
+    s2.src = 'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js';
+    document.head.appendChild(s2);
+    await new Promise(r=>s2.onload=r);
+    const s3 = document.createElement('script');
+    s3.src = 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js';
+    document.head.appendChild(s3);
+    await new Promise(r=>s3.onload=r);
+
+    firebase.initializeApp(FIREBASE_CONFIG);
+    auth = firebase.auth();
+    db = firebase.firestore();
+    useFirebase = true;
+    setupAuthHandlers();
+    console.log('Firebase initialized');
+    return true;
+  }catch(e){console.warn('Firebase init failed',e); return false}
+}
+
+function saveLocal(){
+  localStorage.setItem(LS_KEY, JSON.stringify(state));
+}
+function loadLocal(){
+  const raw = localStorage.getItem(LS_KEY);
+  if(raw) state = JSON.parse(raw);
+}
+
+function clearLocal(){
+  if(confirm('Clear all local data? This cannot be undone.')){
+    localStorage.removeItem(LS_KEY);
+    state = { income:0, savingsPercent:0, savingsFixed:0, expenses:[], goals:[], user:null };
+    render();
+  }
+}
+
+// --- Basic auth UI (Firebase Google sign-in)
+$('auth-btn').addEventListener('click', async ()=>{
+  if(useFirebase && auth && !state.user){
+    const provider = new firebase.auth.GoogleAuthProvider();
+    try{ await auth.signInWithPopup(provider); }catch(e){console.warn(e)}
+  }else if(useFirebase && auth && state.user){
+    await auth.signOut();
+  } else alert('Firebase not configured — using local mode. To enable cloud sync, paste your Firebase config into the FIREBASE_CONFIG variable in the script.');
+});
+
+function setupAuthHandlers(){
+  if(!auth) return;
+  auth.onAuthStateChanged(async user=>{
+    if(user){
+      state.user = { uid:user.uid, name:user.displayName, email:user.email };
+      $('user-info').textContent = user.displayName || user.email;
+      $('auth-btn').textContent = 'Sign out';
+      // load cloud data for this user
+      await loadCloud();
+    }else{
+      state.user = null;
+      $('user-info').textContent = 'Not signed in';
+      $('auth-btn').textContent = 'Sign in';
+      // if signed out, keep local data only
+      loadLocal();
+      render();
+    }
+  });
+}
+
+async function saveCloud(){
+  if(!useFirebase || !state.user) return;
+  const docRef = db.collection('users').doc(state.user.uid);
+  await docRef.set(state);
+}
+async function loadCloud(){
+  if(!useFirebase || !state.user) return;
+  const docRef = db.collection('users').doc(state.user.uid);
+  const snap = await docRef.get();
+  if(snap.exists){ state = snap.data(); }
+  // merge emergency fund if missing
+  if(!state.expenses) state.expenses = [];
+  if(!state.goals) state.goals = [];
+  saveLocal();
+  render();
+}
+
+// --- App logic
+function computeSavings(income, pct, fixed){
+  income = Number(income)||0; pct = Number(pct)||0; fixed = Number(fixed)||0;
+  if(pct>0) return Math.round(income * (pct/100));
+  return Math.round(Math.min(fixed || 0, income));
+}
+
+function monthKey(dateStr){
+  const d = dateStr ? new Date(dateStr) : new Date();
+  return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}`;
+}
+
+function getThisMonthExpenses(){
+  const key = monthKey();
+  return (state.expenses||[]).filter(e=>monthKey(e.date)===key);
+}
+
+function totalSpentThisMonth(){
+  return getThisMonthExpenses().reduce((s,e)=>s+Number(e.amount||0),0);
+}
+
+function render(){
+  // inputs
+  $('emergency').textContent = fmt(EMERGENCY_FUND);
+  $('income').value = state.income||'';
+  $('savingsPercent').value = state.savingsPercent||'';
+  $('savingsFixed').value = state.savingsFixed||'';
+
+  const allocated = computeSavings(state.income, state.savingsPercent, state.savingsFixed);
+  $('allocatedSavings').textContent = fmt(allocated);
+
+  const spent = totalSpentThisMonth();
+  const spendable = Math.max(0, (Number(state.income||0) - allocated));
+  $('spendable').textContent = fmt(spendable);
+  $('spent').textContent = fmt(spent);
+  $('remaining').textContent = `₹ ${fmt(Math.max(0, spendable - spent))}`;
+
+  // list expenses
+  const list = $('list'); list.innerHTML = '';
+  const items = getThisMonthExpenses().slice().reverse();
+  if(items.length===0) list.innerHTML = '<div class="muted">No expenses for this month</div>';
+  for(const e of items){
+    const div = document.createElement('div'); div.className='expense-item';
+    const left = document.createElement('div'); left.innerHTML = `<div style="font-weight:600">₹ ${fmt(e.amount)}</div><div class="muted">${e.category} • ${e.note||''}</div>`;
+    const right = document.createElement('div'); right.innerHTML = `<div class="muted">${e.date}</div>`;
+    div.appendChild(left); div.appendChild(right);
+    list.appendChild(div);
+  }
+
+  // goals
+  const gdiv = $('goals'); gdiv.innerHTML='';
+  for(const g of state.goals||[]){
+    const wrapper = document.createElement('div'); wrapper.className='card'; wrapper.style.marginBottom='8px';
+    const saved = g.saved||0;
+    const pct = Math.min(100, Math.round((saved / g.target)*100));
+    wrapper.innerHTML = `<div style="display:flex;justify-content:space-between"><div style='font-weight:700'>${g.title}</div><div class='muted'>Target ₹ ${fmt(g.target)}</div></div>
+      <div class='muted small'>Saved: ₹ ${fmt(saved)}</div>
+      <div class='progress' style='margin-top:6px'><i style='width:${pct}%'></i></div>`;
+    gdiv.appendChild(wrapper);
+  }
+
+}
+
+// --- Event listeners for inputs
+$('income').addEventListener('change', e=>{ state.income = Number(e.target.value||0); persist(); });
+$('savingsPercent').addEventListener('change', e=>{ state.savingsPercent = Number(e.target.value||0); persist(); });
+$('savingsFixed').addEventListener('change', e=>{ state.savingsFixed = Number(e.target.value||0); persist(); });
+
+$('add-expense').addEventListener('click', ()=>{
+  const amount = Number($('amount').value||0);
+  if(!amount || amount<=0){ alert('Enter amount'); return; }
+  const cat = $('category').value||'Misc';
+  const note = $('note').value||'';
+  const date = $('date').value || (new Date()).toISOString().slice(0,10);
+  state.expenses.push({ amount, category:cat, note, date });
+  // optionally allocate savings to goals here (simple: no auto-transfer for now)
+  persist();
+  $('amount').value=''; $('category').value=''; $('note').value='';
+});
+
+$('clear-expenses').addEventListener('click', clearLocal);
+
+$('add-goal').addEventListener('click', ()=>{
+  const title = $('goal-title').value||''; const target = Number($('goal-target').value||0); const deadline = $('goal-deadline').value||null;
+  if(!title || !target){ alert('Enter goal title and target'); return; }
+  state.goals.push({ title, target, deadline, saved:0 });
+  $('goal-title').value=''; $('goal-target').value=''; $('goal-deadline').value='';
+  persist();
+});
+
+function persist(){
+  saveLocal();
+  render();
+  if(useFirebase && state.user) saveCloud();
+}
+
+// initial load
+(async ()=>{
+  // load local first
+  loadLocal();
+  render();
+  if(FIREBASE_CONFIG){
+    const ok = await initFirebase();
+    if(ok) console.log('Cloud mode active');
+    else console.log('Falling back to local only');
+  }
+})();
+
+</script>
+</body>
+</html>
