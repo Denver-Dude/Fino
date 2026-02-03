@@ -5,6 +5,12 @@
 <h1 align="center">Fino 💰</h1>
 <p align="center"><i>A simple personal finance tracking platform</i></p>
 
+<p align="center">
+  <a href="http://denver-dude.github.io/Fino" target="_blank">
+    <img src="https://img.shields.io/badge/Live%20Demo-Visit%20Fino-4f46e5?style=for-the-badge&logo=google-chrome&logoColor=white" />
+  </a>
+</p>
+
 ---
 
 ## Overview
@@ -15,11 +21,11 @@ The goal of Fino is to make financial awareness simple and accessible, without u
 ---
 
 ## Features
-- **Google Authentication** – Secure login using Google accounts  
-- **Expense Tracking** – Log and track daily spending  
-- **Debt Management** – Record and monitor debts over time  
-- **Activity History** – View how finances change over time  
-- **Cloud-based Storage** – Data stored and synced using Firebase  
+- 🔐 **Google Authentication** – Secure login using Google accounts  
+- 💸 **Expense Tracking** – Log and track daily spending  
+- 📊 **Debt Management** – Record and monitor debts over time  
+- 🕒 **Activity History** – View how finances change over time  
+- ☁️ **Cloud-based Storage** – Data stored and synced using Firebase  
 
 ---
 
@@ -40,23 +46,23 @@ The goal of Fino is to make financial awareness simple and accessible, without u
 
 ## Motivation
 This project was built to explore:
-- Authentication flows with Firebase
-- Real-time data storage and retrieval
-- Building a practical, user-focused web application
-
+- Authentication flows with Firebase  
+- Real-time data storage and retrieval  
+- Building a practical, user-focused web application  
+- Managing application state using vanilla JavaScript  
 
 ---
 
 ## Future Improvements
-- Data visualization (charts and summaries)
-- Monthly budgeting goals
-- Exporting financial data
-- Improved UI/UX design
-- Multi-currency support
+- Data visualization (charts and summaries)  
+- Monthly budgeting goals  
+- Exporting financial data  
+- Improved UI/UX design  
+- Multi-currency support  
 
 ---
 
 ## Setup & Installation
 1. Clone the repository  
    ```bash
-   git clone https://github.com/your-username/fino.git
+   git clone https://github.com/Denver-Dude/Fino.git
