@@ -43,7 +43,7 @@ This project was built to explore:
 - Authentication flows with Firebase
 - Real-time data storage and retrieval
 - Building a practical, user-focused web application
-- Managing application state using vanilla JavaScript
+
 
 ---
 
